@@ -17,11 +17,12 @@ public class EmojiTicker implements Drawable {
     private int state = 0;
 
     @Override
-    public void drawFrame(Frame frame) {
+    public void drawFrame(Frame someFrame) {
+        Frame frame = someFrame.getRoot();
         Character stateChar = cycle.get(state);
         frame.setPosition(frame.getRight(), frame.getTop());
-        frame.fill(TextColor.ANSI.BLACK);
-        frame.color(TextColor.ANSI.WHITE);
+        frame.setFillColor(TextColor.ANSI.BLACK);
+        frame.setColor(TextColor.ANSI.WHITE);
         frame.draw(stateChar);
         long dt = Instant.now().toEpochMilli() - timestamp.toEpochMilli();
         if(dt > 100){

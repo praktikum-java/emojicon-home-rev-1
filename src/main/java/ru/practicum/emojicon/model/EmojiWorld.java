@@ -28,16 +28,16 @@ public class EmojiWorld extends EmojiObject implements EntityResolver, EmojiObje
                 .filter(obj -> frame.getLeft() <= obj.getLeft() && frame.getRight() >= obj.getRight() && frame.getTop() <= obj.getTop() && frame.getBottom() >= obj.getBottom())
                 .forEach(obj -> {
                     TranslatedFrame objFrame = new TranslatedFrame(frame, new Point(obj.getX(), obj.getY()));
-                    objFrame.transparent(TextColor.ANSI.BLACK_BRIGHT);
+                    objFrame.setTransparentColor(TextColor.ANSI.BLACK_BRIGHT);
                     obj.drawFrame(objFrame);
                 });
     }
 
     private void drawEarth(Frame frame) {
-        for(int x = frame.getLeft(); x <= frame.getRight(); x++){
-            for (int y = frame.getTop(); y <= frame.getBottom(); y++){
+        for(int x = Math.max(0, frame.getLeft()); x <= Math.min(getWidth(), frame.getRight()); x++){
+            for (int y = Math.max(0, frame.getTop()); y <= Math.min(getHeight(), frame.getBottom()); y++){
                 frame.setPosition(x, y);
-                frame.fill(TextColor.ANSI.BLACK_BRIGHT);
+                frame.setFillColor(TextColor.ANSI.BLACK_BRIGHT);
                 frame.paint();
             }
         }

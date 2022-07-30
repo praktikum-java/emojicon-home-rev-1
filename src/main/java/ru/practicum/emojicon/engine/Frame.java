@@ -1,118 +1,41 @@
 package ru.practicum.emojicon.engine;
 
-import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
-import com.googlecode.lanterna.screen.Screen;
 import com.vdurmont.emoji.Emoji;
 
-public class Frame {
-    private final int left;
-    private final int top;
-    private final int right;
-    private final int bottom;
+public interface Frame {
 
-    private int posX;
-    private int posY;
-    private TextColor transparentColor;
-    private TextColor fillColor;
-    private TextColor color;
-    Screen screen;
+    int getLeft();
 
-    public Frame(Screen screen, int left, int top, int right, int bottom) {
-        this.screen = screen;
-        this.left = left;
-        this.top = top;
-        this.right = right;
-        this.bottom = bottom;
-        this.posX = 0;
-        this.posY = 0;
-        this.transparentColor = this.fillColor = this.color = TextColor.ANSI.BLACK;
-    }
+    int getTop();
 
-    public int getLeft() {
-        return left;
-    }
+    int getRight();
 
-    public int getTop() {
-        return top;
-    }
+    int getBottom();
 
-    public int getRight() {
-        return right;
-    }
+    int getPosX();
 
-    public int getBottom() {
-        return bottom;
-    }
+    int getPosY();
 
-    public int getPosX() {
-        return posX;
-    }
+    TextColor getTransparentColor();
 
-    public int getPosY() {
-        return posY;
-    }
+    TextColor getFillColor();
 
-    public TextColor getTransparentColor() {
-        return transparentColor;
-    }
+    TextColor getColor();
 
-    public TextColor getFillColor() {
-        return fillColor;
-    }
+    void setPosition(int x, int y);
 
-    public TextColor getColor() {
-        return color;
-    }
+    void setFillColor(TextColor fillColor);
 
-    //set position for painting
-    public void setPosition(int x, int y){
-        if(x < left || x > right || y < top || y > bottom)
-            throw new IllegalArgumentException("position out of bounds");
+    void setColor(TextColor color);
 
-        posX = x - left;
-        posY = y - top;
-    }
+    void setTransparentColor(TextColor color);
 
-    //set background color
-    public void fill(TextColor fillColor){
-        this.fillColor = fillColor;
-    }
+    Point paint();
 
-    //set paint color
-    public void color(TextColor color){
-        this.color = color;
-    }
+    Point draw(Character character);
 
-    public void transparent(TextColor color){
-        if(this.transparentColor == null)
-            throw new IllegalArgumentException();
-        this.transparentColor = color;
-    }
+    Point draw(Emoji emoji);
 
-    //paint it with background color
-    public Point paint(){
-        screen.setCharacter(posX, posY, TextCharacter.DEFAULT_CHARACTER.withCharacter(' ').withBackgroundColor(getRealFillColor()));
-        return new Point(1, 1);
-    }
-
-    //draw single character or
-    public Point draw(Character character){
-        screen.setCharacter(posX, posY, TextCharacter.DEFAULT_CHARACTER.withCharacter(character).withForegroundColor(color).withBackgroundColor(getRealFillColor()));
-        return new Point(1, 1);
-    }
-
-    //draw emoji
-    //some emoji take more than one symbol
-    public Point draw(Emoji emoji){
-        TextCharacter[] chars = TextCharacter.fromString(emoji.getUnicode());
-        for(int c = 0; c < chars.length; c++){
-            screen.setCharacter(posX, posY, chars[c].withForegroundColor(color).withBackgroundColor(getRealFillColor()));
-        }
-        return new Point(chars.length, 1);
-    }
-
-    private TextColor getRealFillColor() {
-        return fillColor != null ? fillColor : transparentColor;
-    }
+    Frame getRoot();
 }

@@ -13,6 +13,7 @@ public class Frame {
 
     private int posX;
     private int posY;
+    private TextColor transparentColor;
     private TextColor fillColor;
     private TextColor color;
     Screen screen;
@@ -25,7 +26,7 @@ public class Frame {
         this.bottom = bottom;
         this.posX = 0;
         this.posY = 0;
-        this.fillColor = this.color = TextColor.ANSI.BLACK;
+        this.transparentColor = this.fillColor = this.color = TextColor.ANSI.BLACK;
     }
 
     public int getLeft() {
@@ -50,6 +51,10 @@ public class Frame {
 
     public int getPosY() {
         return posY;
+    }
+
+    public TextColor getTransparentColor() {
+        return transparentColor;
     }
 
     public TextColor getFillColor() {
@@ -79,15 +84,21 @@ public class Frame {
         this.color = color;
     }
 
+    public void transparent(TextColor color){
+        if(this.transparentColor == null)
+            throw new IllegalArgumentException();
+        this.transparentColor = color;
+    }
+
     //paint it with background color
     public Point paint(){
-        screen.setCharacter(posX, posY, TextCharacter.DEFAULT_CHARACTER.withCharacter(' ').withBackgroundColor(fillColor));
+        screen.setCharacter(posX, posY, TextCharacter.DEFAULT_CHARACTER.withCharacter(' ').withBackgroundColor(getRealFillColor()));
         return new Point(1, 1);
     }
 
     //draw single character or
     public Point draw(Character character){
-        screen.setCharacter(posX, posY, TextCharacter.DEFAULT_CHARACTER.withCharacter(character).withForegroundColor(color).withBackgroundColor(fillColor));
+        screen.setCharacter(posX, posY, TextCharacter.DEFAULT_CHARACTER.withCharacter(character).withForegroundColor(color).withBackgroundColor(getRealFillColor()));
         return new Point(1, 1);
     }
 
@@ -96,8 +107,12 @@ public class Frame {
     public Point draw(Emoji emoji){
         TextCharacter[] chars = TextCharacter.fromString(emoji.getUnicode());
         for(int c = 0; c < chars.length; c++){
-            screen.setCharacter(posX, posY, chars[c].withForegroundColor(color).withBackgroundColor(fillColor));
+            screen.setCharacter(posX, posY, chars[c].withForegroundColor(color).withBackgroundColor(getRealFillColor()));
         }
         return new Point(chars.length, 1);
+    }
+
+    private TextColor getRealFillColor() {
+        return fillColor != null ? fillColor : transparentColor;
     }
 }

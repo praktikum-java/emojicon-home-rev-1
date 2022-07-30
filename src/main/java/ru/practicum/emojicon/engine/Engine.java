@@ -1,18 +1,18 @@
 package ru.practicum.emojicon.engine;
 
-import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
-import ru.practicum.emojicon.model.EmojiWorld;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.time.Period;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Engine implements Runnable {
 
@@ -20,7 +20,7 @@ public class Engine implements Runnable {
     private static final Long FRAME_TIME = 1000L / 60;
     private Terminal terminal;
     private Screen screen;
-    private Drawable root;
+    private List<Drawable> roots = new ArrayList<>();
     private Camera camera;
 
     private Instant timestamp;
@@ -30,16 +30,16 @@ public class Engine implements Runnable {
             this.terminal = new DefaultTerminalFactory(System.out, System.in, StandardCharsets.UTF_8).createTerminal();
             this.screen = new TerminalScreen(terminal);
             this.timestamp = Instant.now();
-            TerminalSize size = getTerminalSize();
-            this.camera = new Camera(0, 0, size.getColumns(), size.getRows());
+            Point rb = getTerminalSize();
+            this.camera = new Camera(0, 0, rb.getX(), rb.getY());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private TerminalSize getTerminalSize() {
+    private Point getTerminalSize() {
         try {
-            return terminal.getTerminalSize();
+            return new Point(terminal.getTerminalSize());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -53,8 +53,12 @@ public class Engine implements Runnable {
             do {
                 key = screen.pollInput();
                 screen.clear();
+                screen.doResizeIfNecessary();
+                Point size = getTerminalSize();
+                screen.setCursorPosition(new TerminalPosition(size.getX(), 0));
+                camera.setRightBottom(size.dec(1, 1));
                 Frame rootFrame = camera.getFrame(screen);
-                root.drawFrame(rootFrame);
+                roots.forEach(root -> root.drawFrame(rootFrame));
                 screen.refresh(Screen.RefreshType.DELTA);
                 long dt = Instant.now().toEpochMilli() - timestamp.toEpochMilli();
                 timestamp = Instant.now();
@@ -66,7 +70,7 @@ public class Engine implements Runnable {
         }
     }
 
-    public void setRoot(Drawable root) {
-        this.root = root;
+    public void addRoot(Drawable root) {
+        this.roots.add(root);
     }
 }

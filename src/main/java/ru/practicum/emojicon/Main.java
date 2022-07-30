@@ -12,6 +12,7 @@ import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.practicum.emojicon.engine.EmojiTicker;
 import ru.practicum.emojicon.engine.Engine;
 import ru.practicum.emojicon.model.EmojiWorld;
 
@@ -27,7 +28,8 @@ public class Main {
     public static void main(String[] args) throws Exception {
         EmojiWorld world = new EmojiWorld();
         Engine engine = new Engine();
-        engine.setRoot(world);
+        engine.addRoot(world);
+        engine.addRoot(new EmojiTicker());
         engine.run();
     }
 

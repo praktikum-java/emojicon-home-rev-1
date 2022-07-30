@@ -4,6 +4,7 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.screen.Screen;
 import com.vdurmont.emoji.Emoji;
 
+//фрейм для изолированного рисования объектов, пока наследуем от Frame.
 public class TranslatedFrame extends Frame {
 
     private final Frame rootFrame;

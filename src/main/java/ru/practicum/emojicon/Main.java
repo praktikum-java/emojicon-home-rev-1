@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Main {
 
@@ -29,7 +30,8 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         EmojiWorld world = new EmojiWorld();
-        world.addObject(new EmojiCat("Tom"), new Point(1, 1));
+        UUID objectId = world.addObject(new EmojiCat("Tom"), new Point(1, 1));
+        world.setSelection(objectId);
         Engine engine = new Engine();
         engine.addRoot(world);
         engine.addRoot(new EmojiTicker());

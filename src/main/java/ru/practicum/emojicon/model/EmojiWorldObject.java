@@ -1,22 +1,28 @@
 package ru.practicum.emojicon.model;
 
-import ru.practicum.emojicon.engine.Drawable;
-import ru.practicum.emojicon.engine.Frame;
-import ru.practicum.emojicon.engine.Point;
+import ru.practicum.emojicon.engine.*;
 
-public class EmojiWorldObject implements Drawable {
+import java.util.UUID;
 
-    private EmojiObject inner;
+public class EmojiWorldObject implements Boxed, Drawable, Controllable, Entity {
+
+    private final EmojiObjectHolder parent;
+    private final UUID id;
+    private final EmojiObject inner;
 
     private int x;
     private int y;
     private int z; //order
 
-    public EmojiWorldObject(EmojiObject obj, Point position) {
+    public EmojiWorldObject(EmojiObjectHolder parent, EmojiObject obj, Point position) {
+        this.parent = parent;
         this.inner = obj;
         this.x = position.getX();
         this.y = position.getY();
+        if(!parent.isFreeArea(getLeft(), getTop(), getRight(), getBottom()))
+            throw new IllegalArgumentException();
         this.z = 0;
+        this.id = UUID.randomUUID();
     }
 
     public int getX() {
@@ -43,8 +49,51 @@ public class EmojiWorldObject implements Drawable {
         this.z = z;
     }
 
+    public UUID getId() {
+        return id;
+    }
+
     @Override
     public void drawFrame(Frame frame) {
         inner.drawFrame(frame);
+    }
+
+    @Override
+    public boolean move(Point step) {
+        int nextLeft = x + step.getX();
+        int nextTop = y + step.getY();
+        int nextRight = nextLeft + inner.getWidth();
+        int nextBottom = nextTop + inner.getHeight();
+        if(parent.isFreeArea(nextLeft, nextTop, nextRight, nextBottom)){
+            x = nextLeft;
+            y = nextTop;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public int getWidth() {
+        return inner.getWidth();
+    }
+
+    public int getHeight() {
+        return inner.getHeight();
+    }
+
+    public int getBottom() {
+        return getY() + getHeight() - 1;
+    }
+
+    public int getTop() {
+        return getY();
+    }
+
+    public int getRight() {
+        return getX() + getWidth() - 1;
+    }
+
+    public int getLeft() {
+        return getX();
     }
 }

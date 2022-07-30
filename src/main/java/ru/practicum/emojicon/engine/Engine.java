@@ -13,8 +13,10 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-public class Engine implements Runnable {
+public class Engine implements Runnable, EntityResolver {
 
     //время одного кадра при частоте в 60 FPS
     private static final Long FRAME_TIME = 1000L / 60;
@@ -31,7 +33,7 @@ public class Engine implements Runnable {
             this.screen = new TerminalScreen(terminal);
             this.timestamp = Instant.now();
             Point rb = getTerminalSize();
-            this.camera = new Camera(0, 0, rb.getX(), rb.getY());
+            this.camera = new Camera(this,0, 0, rb.getX(), rb.getY());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -59,6 +61,12 @@ public class Engine implements Runnable {
                 camera.setRightBottom(size.dec(1, 1));
                 Frame rootFrame = camera.getFrame(screen);
                 roots.forEach(root -> root.drawFrame(rootFrame));
+                Optional.ofNullable(key).ifPresent(lastKey -> {
+                    roots.stream().filter(root -> root instanceof Controller).map(root -> (Controller) root).forEach(ctrl -> {
+                        ctrl.handleKey(lastKey);
+                        camera.handleSelection(ctrl);
+                    });
+                });
                 screen.refresh(Screen.RefreshType.DELTA);
                 long dt = Instant.now().toEpochMilli() - timestamp.toEpochMilli();
                 timestamp = Instant.now();
@@ -72,5 +80,10 @@ public class Engine implements Runnable {
 
     public void addRoot(Drawable root) {
         this.roots.add(root);
+    }
+
+    @Override
+    public Optional<? extends Entity> findEntity(UUID uuid) {
+        return roots.stream().filter(root -> root instanceof EntityResolver).map(root -> (EntityResolver) root).flatMap(root -> root.findEntity(uuid).stream()).findFirst();
     }
 }

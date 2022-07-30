@@ -17,18 +17,37 @@ public class Main {
 
     private final static Logger log = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         Terminal terminal = new DefaultTerminalFactory(System.out, System.in, StandardCharsets.UTF_8).createTerminal();
         TerminalScreen screen = new TerminalScreen(terminal);
         TerminalSize size = screen.getTerminalSize();
         screen.startScreen();
         log.info("screen started {}x{}", size.getColumns(), size.getRows());
         KeyStroke key;
+        int charKode = 0;
+        int row = 1;
+        int col = 1;
         do {
-            screen.setCharacter(0, 0, TextCharacter.DEFAULT_CHARACTER.withCharacter('@'));
+            try {
+                screen.setCharacter(col, row, TextCharacter.DEFAULT_CHARACTER.withCharacter((char) charKode));
+            } catch (IllegalArgumentException e){
+                log.error("illegal symbol {}", String.format("0x%08X", charKode));
+            }
+            Thread.sleep(50);
             screen.refresh();
-            key = screen.readInput();
-        } while (!key.getKeyType().equals(KeyType.Escape));
+            key = screen.pollInput();
+            charKode++;
+            col++;
+            if(col + 1 == size.getColumns()){
+                if(row + 1 < size.getRows()){
+                    col = 1;
+                    row++;
+                } else {
+                    col = 1;
+                    row = 1;
+                }
+            }
+        } while (key == null || !key.getKeyType().equals(KeyType.Escape));
         screen.stopScreen();
     }
 }

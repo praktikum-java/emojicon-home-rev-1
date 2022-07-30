@@ -12,6 +12,8 @@ import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.practicum.emojicon.engine.Engine;
+import ru.practicum.emojicon.model.EmojiWorld;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -22,7 +24,14 @@ public class Main {
 
     private final static Logger log = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws Exception {
+        EmojiWorld world = new EmojiWorld();
+        Engine engine = new Engine();
+        engine.setRoot(world);
+        engine.run();
+    }
+
+    public static void demo(String[] args) throws IOException, InterruptedException {
         Terminal terminal = new DefaultTerminalFactory(System.out, System.in, StandardCharsets.UTF_8).createTerminal();
         TerminalScreen screen = new TerminalScreen(terminal);
         TerminalSize size = screen.getTerminalSize();
@@ -53,6 +62,7 @@ public class Main {
             emojiCode++;
         } while ((key == null || !key.getKeyType().equals(KeyType.Escape)) && emojiCode < emojiList.size());
         screen.stopScreen();
+        terminal.close();
     }
 }
 

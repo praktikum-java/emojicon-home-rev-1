@@ -3,15 +3,7 @@ package ru.practicum.emojicon.engine;
 import com.googlecode.lanterna.TextColor;
 import com.vdurmont.emoji.Emoji;
 
-public interface Frame {
-
-    int getLeft();
-
-    int getTop();
-
-    int getRight();
-
-    int getBottom();
+public interface Frame extends Boxed {
 
     int getPosX();
 

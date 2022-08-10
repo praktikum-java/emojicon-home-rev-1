@@ -63,17 +63,32 @@ public class EmojiWorld extends EmojiObject implements EntityResolver, EmojiObje
     public void handleKey(KeyStroke key) {
         objects.stream().filter(obj -> obj.getId().equals(selection)).filter(obj -> obj instanceof Controllable).map(obj -> (Controllable) obj).forEach(obj -> {
             switch (key.getKeyType()){
-                case ArrowDown, ArrowLeft, ArrowUp, ArrowRight -> {
-                    Point pt = switch (key.getKeyType()){
-                        case ArrowDown -> new Point(0, 1);
-                        case ArrowLeft -> new Point(-1, 0);
-                        case ArrowRight -> new Point(1, 0);
-                        case ArrowUp -> new Point(0, -1);
-                        default -> throw new IllegalArgumentException();
-                    };
+                case ArrowDown:
+                case ArrowLeft:
+                case ArrowUp:
+                case ArrowRight:
+                    Point pt = null;
+                    switch (key.getKeyType()){
+                        case ArrowDown:
+                            pt = new Point(0, 1);
+                            break;
+                        case ArrowLeft:
+                            pt = new Point(-1, 0);
+                            break;
+                        case ArrowRight:
+                            pt = new Point(1, 0);
+                            break;
+                        case ArrowUp:
+                            pt = new Point(0, -1);
+                            break;
+                        default:
+                            throw new IllegalArgumentException();
+                    }
                     obj.move(pt);
+                    break;
+                default:
+
                 }
-            }
         });
     }
 

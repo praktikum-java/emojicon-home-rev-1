@@ -2,18 +2,37 @@ package ru.practicum.emojicon.model;
 
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.KeyStroke;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.practicum.emojicon.engine.*;
 
 import java.util.*;
 
 public class EmojiWorld extends EmojiObject implements EntityResolver, EmojiObjectHolder, Controller {
 
+    private Logger log = LoggerFactory.getLogger(getClass());
+
     private List<EmojiWorldObject> objects = new ArrayList<>();
     private UUID selection = null;
+    private List<List<Byte>> landscape;
 
     public EmojiWorld(){
-        this.setWidth(2048);
-        this.setHeight(2048);
+        this.initEarth(2048, 2048);
+        log.info("world created");
+    }
+
+    private void initEarth(int width, int height) {
+        this.setWidth(width);
+        this.setHeight(height);
+        List<List<Byte>> hMap = new ArrayList<>();
+        for(int x = 0; x<width; x++){
+            List<Byte> hRow = new ArrayList<>();
+            for(int y = 0; y < height; y++){
+                hRow.add((byte) 0);
+            }
+            hMap.add(hRow);
+        }
+        this.landscape = hMap;
     }
 
     @Override
